@@ -232,6 +232,17 @@
 #define kk_likely(x)       (x)
 #endif
 
+// optimizer hint: promise that cond is true at this point
+#if defined(__clang__)
+#define kk_assume(cond)    __builtin_assume(cond)
+#elif defined(__GNUC__) && (__GNUC__ >= 13)
+#define kk_assume(cond)    __attribute__((assume(cond)))
+#elif defined(_MSC_VER)
+#define kk_assume(cond)    __assume(cond)
+#else
+#define kk_assume(cond)    ((void)0)
+#endif
+
 // assign const field in a struct
 #define kk_assign_const(tp,field) ((tp*)&(field))[0]
 

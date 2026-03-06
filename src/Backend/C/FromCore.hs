@@ -1681,10 +1681,13 @@ genPatternTest doTest eagerPatBind (exprDoc,pattern)
 
           conTest conInfo
             = do local <- newVarName "con"
+                 tagLocal <- newVarName "tag"
                  let next    = genNextPatterns (\self fld -> self <.> text "->" <.> fld) (ppDefName local) (typeOf tname) patterns
                      typeDoc = text "struct" <+> ppName (conInfoName conInfo) <.> text "*"
+                     tagAssign = text "bool" <+> ppDefName tagLocal <+> text "=" <+> conTestName conInfo <.> arguments [exprDoc] <.> semi
+                     assume  = text "kk_assume" <.> parens (ppDefName tagLocal) <.> semi
                      assign  = typeDoc <+> ppDefName local <+> text "=" <+> conAsName conInfo <.> arguments [exprDoc] <.> semi
-                 return [(xtest [conTestName conInfo <.> arguments [exprDoc]],[assign],[],next)]
+                 return [(xtest [conTestName conInfo <.> arguments [exprDoc]],[tagAssign, assume, assign],[],next)]
 
 patternVarFree  pat
   = case pat of
